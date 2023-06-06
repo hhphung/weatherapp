@@ -1,51 +1,76 @@
 from io import BytesIO
 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageFilter
 import requests
 import json
 import tkinter as tk
+from data.Data import Data
 
 
 def get_weather(api_key, location):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={location}&APPID={api_key}"
     response = requests.get(url)
     data = json.loads(response.text)
-    return data
+    a = Data(data)
+    return a
 
 
 def display_weather(data):
-    location = data['name']
-    temperature = data['main']['temp']
-    weather_condition = data['weather'][0]['description']
-    weather_icon_id = data['weather'][0]['icon']
-
-    root = tk.Tk()
-    root.title("Weather App")
-
-    weather_label = tk.Label(root,
-                             text=f"Weather in {location}:\nTemperature: {temperature} K\nCondition: {weather_condition}",
-                             padx=10, pady=10)
-    weather_label.pack()
-
-    # Load weather icon from URL
-    weather_icon_url = f"http://openweathermap.org/img/wn/{weather_icon_id}.png"
-    response = requests.get(weather_icon_url)
-    image_data = response.content
-    photo = ImageTk.PhotoImage(Image.open(BytesIO(image_data)))
-
-    # Display weather icon using Label widget
-    weather_icon_label = tk.Label(root, image=photo)
-    weather_icon_label.pack()
-
-    root.mainloop()
+    location = data.name
+    temperature = data.temp_in_F()
+    weather_condition = data.weather_desc
 
 
-if __name__ == "__main__":
-    api_key = "00beef8fc9c995b42a522b5f790ee829"
-    location = "New York"
 
-    weather_data = get_weather(api_key, location)
-    display_weather(weather_data)
+
+
+
+
+window = tk.Tk()
+
+# Set the default window size
+default_width = 1000
+default_height = 600
+window.geometry(f"{default_width}x{default_height}")
+
+# Load the image
+image = Image.open("./background_pictures/cloud-blue-sky.jpg")  # Replace "background_image.jpg" with your image file
+
+# Resize the image to fit the window size
+resized_image = image.resize((default_width, default_height), Image.ANTIALIAS)
+
+# Apply a blur filter to the image
+blurred_image = resized_image.filter(ImageFilter.BLUR)
+
+# Convert the blurred image to Tkinter-compatible format
+photo = ImageTk.PhotoImage(blurred_image)
+
+# Create a Label widget with the blurred image
+label = tk.Label(window, image=photo)
+label.place(x=0, y=0, relwidth=1, relheight=1)
+
+# Create a frame for the sections
+frame = tk.Frame(window, padx=10, pady=10)
+frame.pack(side=tk.TOP)
+
+# City Name Section
+city_label = tk.Label(frame, text="City Name", font=("Arial", 16))
+city_label.pack(anchor=tk.W)
+
+# Temperature Section
+temp_label = tk.Label(frame, text="Temperature: ", font=("Arial", 14))
+temp_label.pack(anchor=tk.W)
+
+# Weather Condition Section
+condition_label = tk.Label(frame, text="Weather Condition: ", font=("Arial", 14))
+condition_label.pack(anchor=tk.W)
+
+# Run the Tkinter event loop
+window.mainloop()
+
+
+
+
 
 
 
