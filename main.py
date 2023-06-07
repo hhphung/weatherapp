@@ -4,6 +4,7 @@ import requests
 import json
 import tkinter as tk
 import random
+from data.Data import Data
 
 window = tk.Tk()
 
@@ -12,27 +13,28 @@ default_width = 1000
 default_height = 500
 window.geometry(f"{default_width}x{default_height}")
 
-# Load the image
-image = Image.open("./background_pictures/cloud-blue-sky.jpg")  # Replace "background_image.jpg" with your image file
+# Load the background image
+background_image = Image.open("./background_pictures/background.jpg")
 
-# Resize the image to fit the window size
-resized_image = image.resize((default_width, default_height), Image.ANTIALIAS)
+# Resize the background image to fit the window size
+resized_background = background_image.resize((default_width, default_height), Image.ANTIALIAS)
 
-# Apply a blur filter to the image
-blurred_image = resized_image.filter(ImageFilter.BLUR)
+# Apply a blur filter to the background image
+blurred_background = resized_background.filter(ImageFilter.BLUR)
 
-# Convert the blurred image to Tkinter-compatible format
-photo = ImageTk.PhotoImage(blurred_image)
+# Convert the blurred background image to Tkinter-compatible format
+background_photo = ImageTk.PhotoImage(blurred_background)
 
+# Load the picture to be displayed on the left
+weather_condition = Image.open("./weather_icons/cloudy.png")
 
-class Data:
-    def __init__(self, weather_data):
-        self.name = weather_data["name"]
-        self.temp_in_K = weather_data["main"]["temp"]
-        self.weather_desc = weather_data["weather"][0]["description"]
+# Resize the picture image to fit within the frame
+picture_width = 100
+picture_height = default_height - 400
+resized_picture = weather_condition.resize((picture_width, picture_height), Image.ANTIALIAS)
 
-    def temp_in_F(self):
-        return (self.temp_in_K - 273.15) * 9/5 + 32
+# Convert the resized picture image to Tkinter-compatible format
+picture_photo = ImageTk.PhotoImage(resized_picture)
 
 
 def get_weather(api_key, location):
@@ -48,13 +50,17 @@ def display_weather(data):
     temperature = data.temp_in_F()
     weather_condition = data.weather_desc
 
-    # Create a Label widget with the blurred image
-    label = tk.Label(window, image=photo)
-    label.place(x=0, y=0, relwidth=1, relheight=1)
+    # Create a Label widget with the blurred background image
+    background_label = tk.Label(window, image=background_photo)
+    background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
     # Create a frame for the sections
     frame = tk.Frame(window, padx=10, pady=10)
-    frame.pack(side=tk.TOP)
+    frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    # Create a Label widget for the picture on the left
+    picture_label = tk.Label(frame, image=picture_photo)
+    picture_label.pack(side=tk.LEFT)
 
     # City Name Section
     city_label = tk.Label(frame, text=location, font=("Arial", 16))
@@ -63,10 +69,6 @@ def display_weather(data):
     # Temperature Section
     temp_label = tk.Label(frame, text=str(temperature) + " F", font=("Arial", 50))
     temp_label.pack(anchor=tk.W)
-
-    # Weather Condition Section
-    condition_label = tk.Label(frame, text=weather_condition, font=("Arial", 14))
-    condition_label.pack(anchor=tk.W)
 
     # Create a frame for the additional weather information
     frame_bottom = tk.Frame(window, padx=10, pady=10)
@@ -96,55 +98,3 @@ display_weather(data)
 
 # Run the Tkinter event loop
 window.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-""" 
-# Create the main window
-window = tk.Tk()
-
-# Set the window size
-window.geometry("800x600")
-
-# Load the image
-image = Image.open("./background_pictures/cloud-blue-sky.jpg")  # Replace "background_image.jpg" with your image file
-
-# Resize the image to fit the window size
-image = image.resize((800, 600), Image.ANTIALIAS)  # Adjust the width and height as desired
-
-# Convert the image to Tkinter-compatible format
-photo = ImageTk.PhotoImage(image)
-
-# Create a Label widget with the image
-label = tk.Label(window, image=photo)
-label.place(x=0, y=0, relwidth=1, relheight=1)
-
-# Function to display a black screen
-def display_black_screen():
-    label.configure(image='')
-    window.configure(bg="black")
-
-# Create a button
-button = tk.Button(window, text="Click Me", command=display_black_screen)
-
-# Position the button in the bottom right corner
-button.place(relx=1.0, rely=1.0, anchor=tk.SE, x=-10, y=-10)
-
-# Run the Tkinter event loop
-window.mainloop()
-
-
-"""
