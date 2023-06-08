@@ -1,17 +1,19 @@
-from io import BytesIO
+from tkinter import *
 from PIL import Image, ImageTk, ImageFilter
 import requests
 import json
 import tkinter as tk
 import random
 from data.Data import Data
+import pytz
 
 window = tk.Tk()
 
 # Set the default window size
-default_width = 1000
+default_width = 900
 default_height = 500
-window.geometry(f"{default_width}x{default_height}")
+window.geometry(f"{default_width}x{default_height}+300+200")
+window.resizable(False,False)
 
 # Load the background image
 background_image = Image.open("./background_pictures/background.jpg")
@@ -91,10 +93,30 @@ def display_weather(data):
     pressure_label.pack(side=tk.LEFT, padx=10)
 
 
+
+
+
+
 api_key = "00beef8fc9c995b42a522b5f790ee829"
 location = "Florida"
 data = get_weather(api_key, location)
 display_weather(data)
+# search box
+search_image = PhotoImage(file="./weather_icons/search_box.png")
+search_image = search_image.subsample(2)
+search_box = Label(image=search_image)
+search_box.place(x=20, y=20)
+
+textField = Entry(window, justify = "center", width = 17,font = ("poppins", 20, "bold"), bg = "#595959", border= 0, fg = "white")
+textField.place(x=30, y = 30)
+textField.focus()
+
+search_icon = PhotoImage(file="./weather_icons/search_Icon.png")
+search_icon  = search_icon.subsample(22)
+my_icon = Button(image = search_icon, borderwidth = 0, cursor = "hand2",bg ="#595959")
+my_icon.place(x =250, y = 22)
+
+
 
 # Run the Tkinter event loop
 window.mainloop()
