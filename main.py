@@ -5,47 +5,60 @@ import json
 import tkinter as tk
 import random
 import pytz
+from  geopy.geocoders import Photon
+from timezonefinder import TimezoneFinder
+from datetime import datetime
+
 
 window = tk.Tk()
 api_key = "00beef8fc9c995b42a522b5f790ee829"
-location = "Florida"
+
 # Set the default window size
 default_width = 900
 default_height = 500
 window.geometry(f"{default_width}x{default_height}+300+200")
 window.resizable(False,False)
 
-# Load the background image
-background_image = Image.open("./background_pictures/background.jpg")
-
-# Resize the background image to fit the window size
-resized_background = background_image.resize((default_width, default_height), Image.ANTIALIAS)
-
-# Apply a blur filter to the background image
-blurred_background = resized_background.filter(ImageFilter.BLUR)
-
-# Convert the blurred background image to Tkinter-compatible format
-background_photo = ImageTk.PhotoImage(blurred_background)
-
-# Load the picture to be displayed on the left
-weather_condition = Image.open("./weather_icons/cloudy.png")
-
-# Resize the picture image to fit within the frame
-picture_width = 100
-picture_height = default_height - 400
-resized_picture = weather_condition.resize((picture_width, picture_height), Image.ANTIALIAS)
-
-# Convert the resized picture image to Tkinter-compatible format
-picture_photo = ImageTk.PhotoImage(resized_picture)
-
-
-
 
 def search():
     text = textField.get()
+    geolocator = Photon(user_agent="geoapiExercises")
+    location = geolocator.geocode(text)
+
+    obj = TimezoneFinder()
+    result  =obj.timezone_at(lng = location.longitude, lat = location.latitude)
+
+
+    home =pytz.timezone(result)
+    local_time = datetime.now(home)
+    current_time = local_time.strftime("%I:%M %p")
+    clock.config(text =current_time)
+    name.config(text = "CURRENT WEATHER")
+
+
+
     url = f"http://api.openweathermap.org/data/2.5/weather?q={text}&APPID={api_key}"
-    response = requests.get(url)
-    data = json.loads(response.text)
+    response = requests.get(url).json()
+
+    condition  = response['weather'][0]['main']
+    desctiption = response['weather'][0]['description']
+    temp= int(response['main']['temp']-273.15)
+    pressure = response['main']['pressure']
+    humidity = response['main']['humidity']
+    wind = response['wind']['speed']
+
+    t.config(text=(temp,"°"))
+    c.config(text=(condition, "|", "FEELS", "LIKE", temp, "°"))
+
+
+    w.config(text=wind)
+    h.config(text=humidity)
+    d.config(text = desctiption)
+    p.config(text=pressure)
+
+
+
+
 
 
 search_image = PhotoImage(file="./weather_icons/search_box.png")
@@ -59,8 +72,7 @@ textField.focus()
 
 search_icon = PhotoImage(file="./weather_icons/search_Icon.png")
 search_icon = search_icon.subsample(22)
-
-my_icon = Button(image=search_icon, borderwidth=0, cursor="hand2", bg="#595959", command=search())
+my_icon = Button(image=search_icon, borderwidth=0, cursor="hand2", bg="#595959", command=search)
 my_icon.place(x=250, y=22)
 
 
@@ -68,12 +80,19 @@ my_icon.place(x=250, y=22)
 Logo_image = PhotoImage(file = "./weather_icons/cloudy.png")
 Logo_image = Logo_image.subsample(4)
 logo = Label(image = Logo_image)
-logo.place(x=350, y =150)
+logo.place(x=300, y =150)
 
 #bottom box
-Frame_image = PhotoImage(file = "./weather_icons/bottom_bar.png")
+Frame_image = PhotoImage(file = "./weather_icons/Copy of box.png")
 frame_image = Label(image = Frame_image)
 frame_image.pack(padx= 5, pady =5, side = BOTTOM)
+
+
+#time
+name = Label(window,font = ("arial", 15, "bold"))
+name.place(x=30, y =100)
+clock = Label(window, font =("Helvetica", 20))
+clock.place(x=30, y =130)
 
 
 label1 = Label(window,text = "WIND", font = ("Helvetica",15,'bold'), fg ="white", bg = "#1ab5ef")
@@ -92,9 +111,9 @@ label4.place(x=700, y = 400)
 
 
 t =Label(font=("arial",70,"bold"), fg = "#ee666d")
-t.place(x =400, y = 100)
+t.place(x =450, y = 100)
 c = Label (font= ("arial", 15, 'bold'))
-c.place(x=400, y = 250)
+c.place(x=450, y = 250)
 
 w = Label(text="...", font = ("arial", 15, 'bold'), bg = "#1ab5ef")
 w.place(x=115, y= 430)
