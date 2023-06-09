@@ -120,7 +120,7 @@ w.place(x=115, y= 430)
 h = Label(text="...", font = ("arial", 15, 'bold'), bg = "#1ab5ef")
 h.place(x=280, y= 430)
 d = Label(text="...", font = ("arial", 15, 'bold'), bg = "#1ab5ef")
-d.place(x=500, y= 430)
+d.place(x=480, y= 430)
 p = Label(text="...", font = ("arial", 15, 'bold'), bg = "#1ab5ef")
 p.place(x=740, y= 430)
 
